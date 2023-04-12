@@ -7,14 +7,18 @@ This repository contains Python code which adapts the PPMM optimal transport sol
 - `Data`: Generates inference SDE sample path snapshot data. 
 - `main.py`: Example file which shows how to generate the SDE snapshot data and run both D-PPMM and time-conditioned RQ-NSF to interpolate the measurements. 
 
-The following video shows an example of D-PPMM with transport spline interpolation applied to a fish schooling dataset.
-https://user-images.githubusercontent.com/100333155/231465765-e0ade723-6a40-4fd4-9c7b-b27410b83390.mp4
+The following video shows an example of D-PPMM with transport spline interpolation applied to the fish schooling dataset [5].
+
+
+https://user-images.githubusercontent.com/100333155/231466179-fea210da-1439-4ec2-b815-e83fedfd3425.mp4
+
 
 
 [1] PPMM: https://github.com/ChengzijunAixiaoli/PPMM \
 [2] Transport splines: https://arxiv.org/abs/2010.12101 \
 [3] Neural spline flows: https://github.com/bayesiains/nsf \
-[4] nflows: https://github.com/bayesiains/nflows
+[4] nflows: https://github.com/bayesiains/nflows \
+[5] Fish schooling dataset: https://ir.library.oregonstate.edu/concern/datasets/zk51vq07c
 
 
 
