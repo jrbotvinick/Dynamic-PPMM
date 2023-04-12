@@ -10,13 +10,20 @@ This repository contains Python code which adapts the PPMM optimal transport sol
 The following video shows an example of D-PPMM with transport spline interpolation applied to a 10-dimensional OU-process. 
 
 
-https://user-images.githubusercontent.com/100333155/231482061-aa0a561e-5610-482b-a987-b535ae32f8de.mp4
 
-The following video shows an example of D-PPMM with 
-
-The following video shows an example of D-PPMM with transport spline interpolation applied to the fish schooling dataset [5]. Every 100th snapshot is left out of training for the purpose of testing the interpolation capabilities of D-PPMM and the model shown takes approximately one second of wall-clock time to train. 
+https://user-images.githubusercontent.com/100333155/231482397-49278b7f-f366-420d-9ff4-6b9ac96f9250.mp4
 
 
+
+The following video shows an example of D-PPMM with transport spline interpolation applied to the 10-dimensional Lorenz-96 system. 
+
+
+
+https://user-images.githubusercontent.com/100333155/231486946-607ca9ae-420e-4bb9-a673-f6c00aa6f308.mp4
+
+
+
+The following video shows an example of D-PPMM with transport spline interpolation applied to the fish schooling dataset [5]. 
 
 https://user-images.githubusercontent.com/100333155/231466983-081da8b5-b4cc-4d60-8423-20bb5d80edd0.mp4
 
