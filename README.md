@@ -10,7 +10,10 @@ This repository contains Python code which adapts the PPMM optimal transport sol
 The following video shows an example of D-PPMM with transport spline interpolation applied to the fish schooling dataset [5].
 
 
-https://user-images.githubusercontent.com/100333155/231466179-fea210da-1439-4ec2-b815-e83fedfd3425.mp4
+
+https://user-images.githubusercontent.com/100333155/231466983-081da8b5-b4cc-4d60-8423-20bb5d80edd0.mp4
+
+
 
 
 
