@@ -1,6 +1,7 @@
 # Dynamic-PPMM
 
-This repository adapts the PPMM optimal transport solver [1] to the time-dependent setting by joining samples from successive snapshots by optimal transport maps and applying the transport splines algorithm [2] to interpolate between snapshots using cubic splines. We also include the implementation of a rational quadratic neural spline flow conditioned on time, which can be used as a baseline comparison for Dynamic PPMM. Here is a summary of the files in the repository:
+This repository contains Python code which adapts the PPMM optimal transport solver [1] to the time-dependent setting by joining samples from successive snapshots by optimal transport maps and applying the transport splines algorithm [2] to interpolate between snapshots using cubic splines. We also include the implementation of a rational quadratic neural spline flow conditioned on time, which can be used as a baseline comparison for Dynamic PPMM. Here is a summary of the repository:
+
 - `Sample_SDE.py`: Sample inference snapshot data using the Euler-Maruyama method. 
 - `PPMM_func.py`: Base functions used in the original PPMM implementation [1].
 - `Dynamic_PPMM.py`: Uses `PPMM_func.py` to learn optimal transport plans between `Sample_SDE`'s snapshot data and implements the transport splines algorithm [2]. 
