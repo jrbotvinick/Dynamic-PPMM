@@ -14,3 +14,7 @@ This repository contains Python code which adapts the PPMM optimal transport sol
 
 
 
+
+
+https://user-images.githubusercontent.com/100333155/231465765-e0ade723-6a40-4fd4-9c7b-b27410b83390.mp4
+
