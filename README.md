@@ -7,6 +7,12 @@ This repository contains Python code which adapts the PPMM optimal transport sol
 - `Data`: Generates inference SDE sample path snapshot data. 
 - `main.py`: Example file which shows how to generate the SDE snapshot data and run both D-PPMM and time-conditioned RQ-NSF to interpolate the measurements. 
 
+The following video shows an example of D-PPMM with transport spline interpolation applied to the 2-dimensional van der Pol oscillator. 
+
+
+https://user-images.githubusercontent.com/100333155/231488452-337a8a8d-0f64-4dce-8490-ac20e37ef80d.mp4
+
+
 The following video shows an example of D-PPMM with transport spline interpolation applied to a 10-dimensional OU-process. 
 
 
