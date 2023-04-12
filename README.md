@@ -7,7 +7,7 @@ This repository contains Python code which adapts the PPMM optimal transport sol
 - `Data`: Generates inference SDE sample path snapshot data. 
 - `main.py`: Example file which shows how to generate the SDE snapshot data and run both D-PPMM and time-conditioned RQ-NSF to interpolate the measurements. 
 
-The following video shows an example of D-PPMM with transport spline interpolation applied to the fish schooling dataset [5].
+The following video shows an example of D-PPMM with transport spline interpolation applied to the fish schooling dataset [5]. Every 100th snapshot is left out of training for the purpose of testing the interpolation capabilities of D-PPMM and the model shown takes approximately one second of wall-clock time to train. 
 
 
 
