@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 X,T = Sample_SDE('vanderpol',Npts = 10000) #Generate Inference Trajectories
+T = T/np.max(T)
 Tinterp = np.linspace(0,max(T)-.01,100) #Interpolation times 
 
 
