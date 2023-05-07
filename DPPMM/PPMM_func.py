@@ -131,6 +131,7 @@ from scipy.special import ndtr
 from KDEpy import FFTKDE
 
 from statsmodels.stats.weightstats import DescrStatsW
+import dill
 
 
 def projOtmUtility(data_source, data_target,N, ws, wt,DIR,nbins,bandwidth):
@@ -160,7 +161,10 @@ def projOtmUtility(data_source, data_target,N, ws, wt,DIR,nbins,bandwidth):
     ori_proj_new = T(x)
     delta = ori_proj_new - x
     res = data_source + np.outer(delta, DIR)
-    return res,T
+
+    T_serialized = dill.dumps(T)
+
+    return res,T_serialized
 
 #Projected one-dimensional optimal transport        
 def projOtm(data_source, data_target, N,weight_source= None, weight_target= None, method= "SAVE", nbins = 10,bandwidth='scott'):   

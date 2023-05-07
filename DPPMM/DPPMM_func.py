@@ -18,6 +18,7 @@ from functools import reduce
 import random
 from scipy.interpolate import splprep, splev
 from KDEpy import FFTKDE
+import dill
 
 
 
@@ -72,14 +73,13 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
             itr_data = projOtmUtility_gen(itr_data,DIR,lookup)
         return itr_data
     
-    def train_model(tol1,tol2): #train Dynamic_PPMM
-        LOOKUPS, DIRECTIONS, COUNTS = [], [], []
-        
+    def train_model(tol1,tol2): #train Dynamic_PPMM        
         '''
         Some calculations to distribute timesteps to ranks
         '''
         tpp = int(tnum/nprocs)
         if tpp == 0: # There are not enough timesteps to parallelize
+            LOOKUPS, DIRECTIONS, COUNTS = [], [], []
             if rank == 0:
                 for i in range(tnum):
                     if i == 0:
@@ -90,6 +90,7 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
                         tol = tol2
                     des_data = samples[i]
                     itr_data,lookups,directions,count = model_samples(ori_data,des_data,tol)
+
                     LOOKUPS.append(lookups),DIRECTIONS.append(directions),COUNTS.append(count)
 
             comm.bcast(LOOKUPS,root=0)
@@ -99,6 +100,7 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
             return LOOKUPS,DIRECTIONS,COUNTS
 
         else:
+            LOOKUPS, DIRECTIONS, COUNTS = [], [], []
             for i in range(tpp*rank,tpp*(rank+1)):
                 
                 if i == 0:
@@ -113,19 +115,25 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
                 itr_data,lookups,directions,count = model_samples(ori_data,des_data,tol)
                 LOOKUPS.append(lookups),DIRECTIONS.append(directions),COUNTS.append(count)
 
+
             C_LOOKUPS = comm.gather(LOOKUPS,root=0)
             C_DIRECTIONS = comm.gather(DIRECTIONS,root=0)
             C_COUNTS = comm.gather(COUNTS,root=0)
 
-
             if rank == 0:
-                CC_LOOKUPS, CC_DIRECTIONS, CC_COUNTS = []
+                CC_LOOKUPS, CC_DIRECTIONS, CC_COUNTS = [], [], []
                 for lst in C_LOOKUPS:
                     CC_LOOKUPS.extend(lst)
                 for lst in C_DIRECTIONS:
                     CC_DIRECTIONS.extend(lst)
                 for lst in C_COUNTS:
                     CC_COUNTS.extend(lst)
+            else:
+                CC_LOOKUPS, CC_DIRECTIONS, CC_COUNTS = None, None, None
+
+            CC_LOOKUPS = comm.bcast(CC_LOOKUPS,root=0)
+            CC_DIRECTIONS = comm.bcast(CC_DIRECTIONS,root=0)
+            CC_COUNTS = comm.bcast(CC_COUNTS,root=0)
 
             return CC_LOOKUPS,CC_DIRECTIONS,CC_COUNTS
     
@@ -159,9 +167,22 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
     import time
     t0 = time.time()
     LOOKUPS,DIRECTIONS,COUNTS = train_model(tol1,tol2)
-    t1 = time.time()
-    total1 = t1-t0
-    n_test = N_gen
-    X = test_model(LOOKUPS,DIRECTIONS,COUNTS,n_test)
-    X_new = interpolate2(X, T, T_new,n_test) #uncomment to interpolate for some new times T_new
-    return X,X_new,total1
+
+    DS_LOOKUPS = []
+    for i in range(len(LOOKUPS)):
+        temp = []
+        for j in range(len(LOOKUPS[i])):
+            temp.append(dill.loads(LOOKUPS[i][j]))
+        DS_LOOKUPS.append(temp)
+
+    print(len(DS_LOOKUPS))
+    exit()
+
+    # # Test on one rank only
+    # if rank == 0:
+    #     t1 = time.time()
+    #     total1 = t1-t0
+    #     n_test = N_gen
+    #     X = test_model(DS_LOOKUPS,DIRECTIONS,COUNTS,n_test)
+    #     X_new = interpolate2(X, T, T_new,n_test) #uncomment to interpolate for some new times T_new
+    #     return X,X_new,total1
