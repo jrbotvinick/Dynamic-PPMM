@@ -1,4 +1,10 @@
 #Uses code from https://github.com/ChengzijunAixiaoli/PPMM to build Dynamic PPMM
+from mpi4py import MPI
+# MPI Fluff
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+nprocs = comm.Get_size()
+
 import sys
 import time
 import ot
@@ -12,6 +18,8 @@ from functools import reduce
 import random
 from scipy.interpolate import splprep, splev
 from KDEpy import FFTKDE
+
+
 
 def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
     tol1,tol2 = tol,tol
@@ -66,17 +74,60 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
     
     def train_model(tol1,tol2): #train Dynamic_PPMM
         LOOKUPS, DIRECTIONS, COUNTS = [], [], []
-        for i in range(tnum):
-            if i == 0:
-                ori_data = start
-                tol = tol1
-            else:
-                ori_data = samples[i-1]
-                tol = tol2
-            des_data = samples[i]
-            itr_data,lookups,directions,count = model_samples(ori_data,des_data,tol)
-            LOOKUPS.append(lookups),DIRECTIONS.append(directions),COUNTS.append(count)
-        return LOOKUPS,DIRECTIONS,COUNTS
+        
+        '''
+        Some calculations to distribute timesteps to ranks
+        '''
+        tpp = int(tnum/nprocs)
+        if tpp == 0: # There are not enough timesteps to parallelize
+            if rank == 0:
+                for i in range(tnum):
+                    if i == 0:
+                        ori_data = start
+                        tol = tol1
+                    else:
+                        ori_data = samples[i-1]
+                        tol = tol2
+                    des_data = samples[i]
+                    itr_data,lookups,directions,count = model_samples(ori_data,des_data,tol)
+                    LOOKUPS.append(lookups),DIRECTIONS.append(directions),COUNTS.append(count)
+
+            comm.bcast(LOOKUPS,root=0)
+            comm.bcast(DIRECTIONS,root=0)
+            comm.bcast(COUNTS,root=0)
+
+            return LOOKUPS,DIRECTIONS,COUNTS
+
+        else:
+            for i in range(tpp*rank,tpp*(rank+1)):
+                
+                if i == 0:
+                    ori_data = start
+                    tol = tol1
+                
+                else:
+                    ori_data = samples[i-1]
+                    tol = tol2
+
+                des_data = samples[i]
+                itr_data,lookups,directions,count = model_samples(ori_data,des_data,tol)
+                LOOKUPS.append(lookups),DIRECTIONS.append(directions),COUNTS.append(count)
+
+            C_LOOKUPS = comm.gather(LOOKUPS,root=0)
+            C_DIRECTIONS = comm.gather(DIRECTIONS,root=0)
+            C_COUNTS = comm.gather(COUNTS,root=0)
+
+
+            if rank == 0:
+                CC_LOOKUPS, CC_DIRECTIONS, CC_COUNTS = []
+                for lst in C_LOOKUPS:
+                    CC_LOOKUPS.extend(lst)
+                for lst in C_DIRECTIONS:
+                    CC_DIRECTIONS.extend(lst)
+                for lst in C_COUNTS:
+                    CC_COUNTS.extend(lst)
+
+            return CC_LOOKUPS,CC_DIRECTIONS,CC_COUNTS
     
     def test_model(LOOKUPS,DIRECTIONS,COUNTS,n_test): #test Dynamic_PPMM 
         ori_data = np.random.normal(ICmean,.1,(n_test,pp))
