@@ -162,7 +162,7 @@ def projOtmUtility(data_source, data_target,N, ws, wt,DIR,nbins,bandwidth):
     delta = ori_proj_new - x
     res = data_source + np.outer(delta, DIR)
 
-    T_serialized = dill.dumps(T)
+    T_serialized = dill.dumps(T) # Incompatible with parallelism otherwise
 
     return res,T_serialized
 

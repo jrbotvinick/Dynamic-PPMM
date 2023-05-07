@@ -77,8 +77,8 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
         '''
         Some calculations to distribute timesteps to ranks
         '''
-        tpp = int(tnum/nprocs)
-        if tpp == 0: # There are not enough timesteps to parallelize
+        tpp = int(tnum/nprocs) 
+        if tpp == 0: # There are not enough timesteps to parallelize - so just run serially on rank 0
             LOOKUPS, DIRECTIONS, COUNTS = [], [], []
             if rank == 0:
                 for i in range(tnum):
@@ -99,9 +99,18 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
 
             return LOOKUPS,DIRECTIONS,COUNTS
 
-        else:
+        else: # Each rank gets a bit of the timesteps to work with
             LOOKUPS, DIRECTIONS, COUNTS = [], [], []
-            for i in range(tpp*rank,tpp*(rank+1)):
+
+            # In case of uneven division, the last rank picks up the remainder (11 timesteps 2 ranks - implies rank 0 has 5 timesteps, rank 1 has 6)
+            if rank !=nprocs-1:
+                start_range = tpp*rank
+                end_range = tpp*(rank+1)
+            else:
+                start_range = tpp*rank
+                end_range = tnum
+
+            for i in range(start_range,end_range):
                 
                 if i == 0:
                     ori_data = start
@@ -168,6 +177,7 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
     t0 = time.time()
     LOOKUPS,DIRECTIONS,COUNTS = train_model(tol1,tol2)
 
+    # This step deserializes the lookup functions collected on each rank - I am doing this on all ranks - assuming we also test on all ranks
     DS_LOOKUPS = []
     for i in range(len(LOOKUPS)):
         temp = []
@@ -175,14 +185,10 @@ def DPPMM(samples,T,T_interp,N_gen,tol,Nbins,bandwidth):
             temp.append(dill.loads(LOOKUPS[i][j]))
         DS_LOOKUPS.append(temp)
 
-    print(len(DS_LOOKUPS))
-    exit()
-
-    # # Test on one rank only
-    # if rank == 0:
-    #     t1 = time.time()
-    #     total1 = t1-t0
-    #     n_test = N_gen
-    #     X = test_model(DS_LOOKUPS,DIRECTIONS,COUNTS,n_test)
-    #     X_new = interpolate2(X, T, T_new,n_test) #uncomment to interpolate for some new times T_new
-    #     return X,X_new,total1
+    # Test (performed in parallel - so this can also be done with different times,data)
+    t1 = time.time()
+    total1 = t1-t0
+    n_test = N_gen
+    X = test_model(DS_LOOKUPS,DIRECTIONS,COUNTS,n_test)
+    X_new = interpolate2(X, T, T_new,n_test) #uncomment to interpolate for some new times T_new
+    return X,X_new,total1
