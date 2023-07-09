@@ -9,8 +9,8 @@ This repository contains Python code which extends the PPMM optimal transport so
 
 The code in this repository is compatible with 
 
-- `python` 3.9
-- `PyTorch` 1.11.0
+- `Python` 3.9
+- `torch` 1.11.0
 - `numpy` 1.20.3
 - `matplotlib` 3.5.1
 
