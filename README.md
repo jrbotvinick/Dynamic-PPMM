@@ -9,8 +9,11 @@ This repository contains Python code which extends the PPMM optimal transport so
 
 The code in this repository is compatible with 
 
-- `PyTorch`: 1.11.0
-- `numpy`: 1.20.3
+- `python` 3.9
+- `PyTorch` 1.11.0
+- `numpy` 1.20.3
+- `matplotlib` 3.5.1
+
   
 The following video shows an example of D-PPMM with transport spline interpolation applied to the 2-dimensional van der Pol oscillator. 
 
